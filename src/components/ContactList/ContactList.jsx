@@ -1,14 +1,14 @@
 import PropTypes from 'prop-types';
 import { List } from './ContactList.styled';
 
-function ContactList({ contacts, deleteContact }) {
+function ContactList({ contacts, onClick }) {
   return (
     <List>
       {contacts.map(({ name, number }) => {
         return (
           <li key={name}>
             {name}: {number}
-            <button type={'button'} data-name={name} onClick={deleteContact}>
+            <button type={'button'} data-name={name} onClick={onClick}>
               Delete
             </button>
           </li>
@@ -28,5 +28,5 @@ ContactList.propTypes = {
       number: PropTypes.string,
     }),
   ),
-  deleteContact: PropTypes.func,
+  onClick: PropTypes.func,
 };

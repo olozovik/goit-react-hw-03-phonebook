@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { Component } from 'react';
 import { ContactForm } from './components/ContactForm/ContactForm';
 import { ContactList } from './components/ContactList/ContactList';
@@ -10,31 +11,44 @@ class App extends Component {
     filter: '',
   };
 
-  addContact = newContact => {
-    this.setState(prevState => {
-      const newContacts = [...prevState.contacts];
-      newContacts.push(newContact);
-      return {
-        contacts: newContacts,
-      };
-    });
+  handleOnSubmit = e => {
+    e.preventDefault();
+    const name = e.target.elements.name.value;
+    const number = e.target.elements.number.value;
+
+    const isContactExisting = this.state.contacts.find(
+      contact => contact.name.toLowerCase() === name.toLowerCase(),
+    );
+    if (isContactExisting) {
+      alert(`${this.state.name} is already in contacts.`);
+      return;
+    }
+
+    const newContact = {
+      id: uuidv4(),
+      name,
+      number,
+    };
+    this.setState(prevState => ({
+      contacts: [...prevState.contacts, newContact],
+    }));
   };
 
-  deleteContact = e => {
+  handleOnClickDelete = e => {
     const newContactsList = this.state.contacts.filter(contact => {
       return contact.name !== e.target.dataset.name;
     });
     this.setState({ contacts: newContactsList });
   };
 
-  findContact = e => {
+  handleFilterInput = e => {
     const value = e.target.value;
     this.setState({ filter: value });
   };
 
   render() {
     const { contacts, filter } = this.state;
-    const { addContact, findContact, deleteContact } = this;
+    const { handleOnSubmit, handleFilterInput, handleOnClickDelete } = this;
 
     const contactsToRender = !filter
       ? contacts
@@ -42,23 +56,21 @@ class App extends Component {
           contact.name.toLowerCase().includes(filter.toLowerCase()),
         );
 
+    const unsuccessfulFiltering = filter && contactsToRender.length === 0;
+    const contactsListIsEmpty = !filter && contactsToRender.length === 0;
+
     return (
       <Wrapper>
         <h1>Phonebook</h1>
-        <ContactForm addContact={addContact} contacts={contacts} />
+        <ContactForm onSubmit={handleOnSubmit} contacts={contacts} />
         <h2>Contacts</h2>
-        <Filter filterValue={filter} findContact={findContact} />
+        <Filter inputValue={filter} onChange={handleFilterInput} />
         <ContactList
           contacts={contactsToRender}
-          filterValue={filter}
-          deleteContact={deleteContact}
+          onClick={handleOnClickDelete}
         />
-        {filter && contactsToRender.length === 0 && (
-          <p>There are no contacts with this name.</p>
-        )}
-        {!filter && contactsToRender.length === 0 && (
-          <p>There are no contacts here.</p>
-        )}
+        {unsuccessfulFiltering && <p>There are no contacts with this name.</p>}
+        {contactsListIsEmpty && <p>There are no contacts here.</p>}
       </Wrapper>
     );
   }
