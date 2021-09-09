@@ -17,16 +17,16 @@ class App extends Component {
   }
 
   componentDidUpdate(_, prevState) {
-    if (prevState.constructor !== this.state.contacts) {
+    if (
+      prevState.contacts.length !== 0 &&
+      prevState.contacts !== this.state.contacts
+    ) {
       localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
     }
   }
 
   state = {
-    contacts: [
-      { name: 'John', number: '345345354' },
-      { name: 'aaa', number: '546456645' },
-    ],
+    contacts: [],
     filter: '',
   };
 
