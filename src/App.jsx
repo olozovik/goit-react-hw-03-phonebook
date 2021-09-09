@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import toast, { Toaster } from 'react-hot-toast';
 import { Component } from 'react';
 import { ContactForm } from './components/ContactForm/ContactForm';
 import { ContactList } from './components/ContactList/ContactList';
@@ -6,8 +7,26 @@ import { Filter } from './components/Filter/Filter';
 import { Wrapper } from 'components/Wrapper/Wrapper';
 
 class App extends Component {
+  componentDidMount() {
+    try {
+      const contacts = JSON.parse(localStorage.getItem('contacts')) || [];
+      this.setState({ contacts });
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  componentDidUpdate(_, prevState) {
+    if (prevState.constructor !== this.state.contacts) {
+      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+    }
+  }
+
   state = {
-    contacts: [],
+    contacts: [
+      { name: 'John', number: '345345354' },
+      { name: 'aaa', number: '546456645' },
+    ],
     filter: '',
   };
 
@@ -20,7 +39,8 @@ class App extends Component {
       contact => contact.name.toLowerCase() === name.toLowerCase(),
     );
     if (isContactExisting) {
-      alert(`${this.state.name} is already in contacts.`);
+      toast.error(`${name} is already in contacts.`);
+      // alert(`${name} is already in contacts.`);
       return;
     }
 
@@ -71,6 +91,7 @@ class App extends Component {
         />
         {unsuccessfulFiltering && <p>There are no contacts with this name.</p>}
         {contactsListIsEmpty && <p>There are no contacts here.</p>}
+        <Toaster />
       </Wrapper>
     );
   }

@@ -4,6 +4,15 @@ import PropTypes from 'prop-types';
 import { Form } from './ContactForm.styled';
 
 class ContactForm extends Component {
+  componentDidUpdate(prevProps) {
+    if (prevProps.contacts !== this.props.contacts) {
+      this.setState({
+        name: '',
+        number: '',
+      });
+    }
+  }
+
   static propTypes = {
     onSubmit: PropTypes.func,
     contacts: PropTypes.arrayOf(
@@ -29,17 +38,9 @@ class ContactForm extends Component {
     });
   };
 
-  handleOnSubmit = e => {
-    this.props.onSubmit(e);
-    this.setState({
-      name: '',
-      number: '',
-    });
-  };
-
   render() {
     return (
-      <Form autoComplete={'off'} onSubmit={this.handleOnSubmit}>
+      <Form autoComplete={'off'} onSubmit={this.props.onSubmit}>
         <label htmlFor={this.nameInputId}>
           Name
           <input
